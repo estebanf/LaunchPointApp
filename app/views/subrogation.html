@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-md-1 col-md-offset-11">
-    <button class="btn btn-primary" data-toggle="modal" data-target="#modalSubrogate">Create surrogation</button>
+    <button class="btn btn-primary" ng-click="openModal()">Create surrogation</button>
   </div>
   <div class="col-md-12">
     <h1>Subrogation</h1>
@@ -29,21 +29,27 @@
             {{subrogation.claims.length}}
           </td>
           <td>
-            <button class="btn btn-success" ng-click="selectSubrogation(subrogation)" data-toggle="modal" data-target="#modalSubrogate">View</button>
+            <button class="btn btn-success" ng-click="selectSubrogation(subrogation,$index)">View</button>
+            <button class="btn btn-primary" ng-click="submit(subrogation)">Submit</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
-<div class="modal fade" id="modalSubrogate" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="modalSubrogate">
+  <script type="text/ng-template" id="myModalContent.html">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="resetActive()"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" aria-label="Close" ng-click="dismiss()"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Create/Edit Subrogation</h4>
       </div>
       <div class="modal-body">
+        <div class="row">
+          <div class="col-md-10">
+            <button class="btn btn-warning pull-right" ng-click="generateData()">Generate data</button>
+          </div>
+        </div>
         <form class="form-horizontal">
           <div class="form-group">
             <label for="case_ref" class="col-md-2 control-label">Reference</label>
@@ -112,8 +118,8 @@
                   {{claim.claim_amount | currency }}
                 </td>
                 <td>
-                  <button class="btn btn-info" ng-click="editActiveClaim(claim)">Edit</button>
-                  <button class="btn btn-danger" ng-click="deleteActiveClaim()">Delete</button>
+                  <button class="btn btn-info" ng-click="editActiveClaim(claim,$index)">Edit</button>
+                  <button class="btn btn-danger" ng-click="deleteClaim()">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -121,9 +127,9 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="resetActive()">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="dismiss()">Close</button>
         <button type="button" class="btn btn-primary" ng-click="saveSubrogation()">Save changes</button>
       </div>
-    </div>
+    </script>
   </div>
 </div>

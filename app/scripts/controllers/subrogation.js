@@ -9,7 +9,35 @@
  */
 angular.module('launchPointAppApp')
   .controller('SubrogationCtrl', ['$scope','backend','$uibModal',function ($scope,backend,$uibModal) {
-    console.log($uibModal);
+    $scope.openModal = function(){
+      var modalInstance = $uibModal.open({
+        animation:true,
+        ariaLabelBy: 'modal-title',
+        ariaDescribedBy: 'modal-body',
+        templateUrl: 'myModalContent.html',
+        controller: 'SubrogatemodalCtrl',
+        controllerAs: '$ctrl',
+        resolve:{
+          active: function(){
+            return $scope.activeSubrogation;
+          },
+          editing: function(){
+            return $scope.editingSubrogation;
+          }
+        }
+      });
+      modalInstance.result.then(function(record){
+        if(!$scope.editingSubrogation){
+            $scope.subrogations.push(record);
+        }
+        else{
+          $scope.subrogations[$scope.editingSubrogationIndex] = record;
+        }
+        $scope.resetActive();
+      }, function(){
+        $scope.resetActive();
+      });
+    };
     $scope.resetActive = function(){
       $scope.activeSubrogation={
         case:{},
@@ -24,41 +52,15 @@ angular.module('launchPointAppApp')
         $scope.editingSubrogation = false;
       });
 
-    $scope.selectSubrogation = function(obj){
+    $scope.selectSubrogation = function(obj,index){
       $scope.activeSubrogation = obj;
       $scope.editingSubrogation = true;
+      $scope.editingSubrogationIndex = index;
+      $scope.openModal();
     };
-    $scope.editActiveClaim = function(claim){
-      $scope.activeClaim = claim;
-      $scope.editingClaim = true;
-    };
-    $scope.saveActiveClaim = function(){
-    };
-    $scope.deleteActiveClaim =function(){
-
-    };
-    $scope.addActiveClaim = function(){
-      $scope.activeSubrogation.claims.push($scope.activeClaim);
-      $scope.activeClaim = {};
-    };
-    $scope.saveSubrogation = function(){
-      if(!$scope.editingSubrogation){
-        $scope.activeSubrogation.case.case_type = 'SUBROGATION';
-        backend.createCase($scope.activeSubrogation.case)
-          .then(function(createdCase){
-            $scope.activeSubrogation.case = createdCase;
-            backend.createSubrogation($scope.activeSubrogation)
-              .then(function(createdSubrogation){
-                $scope.activeSubrogation.id = createdSubrogation.id;
-                $scope.activeSubrogation.caseId = createdSubrogation.caseId;
-                angular.forEach($scope.activeSubrogation.claims,function(value,key){
-                  backend.createSubrogationClaim($scope.activeSubrogation.id,value)
-                    .then(function(createdClaim){
-                      $scope.activeSubrogation.claims[key] = createdClaim;
-                    });
-                });
-              });
-          });
-      }
-    };
+    $scope.submit = function(subrogation){
+      backend.submitCase(subrogation).then(function(data){
+        console.log(data);
+      })
+    }
   }]);
