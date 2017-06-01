@@ -14,7 +14,7 @@ angular.module('launchPointAppApp')
 
     $scope.editingSubrogation = editing;
     $scope.generateData = function(){
-      $scope.activeSubrogation = backend.generateFakeData();
+      $scope.activeSubrogation = backend.generateFakeSubrogation();
     }
     $scope.dismiss = function(){
       $uibModalInstance.dismiss('cancel');
@@ -29,7 +29,11 @@ angular.module('launchPointAppApp')
       $scope.activeClaim = {};
       $scope.editingClaim = false;
     };
-    $scope.deleteClaim =function(){
+    $scope.deleteClaim =function(claim,index){
+      backend.deleteSubrogationClaim(claim)
+        .then(function(){
+          $scope.activeSubrogation.claims.splice(index,1);
+        })
 
     };
     $scope.addActiveClaim = function(){

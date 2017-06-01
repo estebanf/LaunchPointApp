@@ -8,7 +8,7 @@
  * Controller of the launchPointAppApp
  */
 angular.module('launchPointAppApp')
-  .controller('SubrogationCtrl', ['$scope','backend','$uibModal',function ($scope,backend,$uibModal) {
+  .controller('SubrogationCtrl', ['$scope','backend','$uibModal','bsLoadingOverlayService',function ($scope,backend,$uibModal,bsLoadingOverlayService) {
     $scope.openModal = function(){
       var modalInstance = $uibModal.open({
         animation:true,
@@ -17,6 +17,7 @@ angular.module('launchPointAppApp')
         templateUrl: 'myModalContent.html',
         controller: 'SubrogatemodalCtrl',
         controllerAs: '$ctrl',
+        size:'lg',
         resolve:{
           active: function(){
             return $scope.activeSubrogation;
@@ -59,8 +60,25 @@ angular.module('launchPointAppApp')
       $scope.openModal();
     };
     $scope.submit = function(subrogation){
+      bsLoadingOverlayService.start({
+        referenceId:subrogation.id
+      })
       backend.submitCase(subrogation).then(function(data){
-        console.log(data);
+        bsLoadingOverlayService.stop({
+          referenceId:subrogation.id
+        })
+        var modalInstance = $uibModal.open({
+          animation:true,
+          ariaLabelBy: 'modal-title',
+          ariaDescribedBy: 'modal-body',
+          templateUrl: 'myModalConfirmContent.html',
+          controller: 'CaseConfirmModal',
+          resolve:{
+            data:data
+          }
+        });
+        modalInstance.result.then(null, function(){
+        });
       })
     }
   }]);

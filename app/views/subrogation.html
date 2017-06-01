@@ -1,6 +1,7 @@
 <div class="row">
   <div class="col-md-1 col-md-offset-11">
-    <button class="btn btn-primary" ng-click="openModal()">Create surrogation</button>
+    <button class="btn btn-primary" ng-click="openModal()"><i class="fa fa-file-o" aria-hidden="true"></i>
+    </button>
   </div>
   <div class="col-md-12">
     <h1>Subrogation</h1>
@@ -18,7 +19,7 @@
         <th></th>
       </thead>
       <tbody>
-        <tr ng-repeat="subrogation in subrogations">
+        <tr ng-repeat="subrogation in subrogations" class="bs-loading-container" bs-loading-overlay bs-loading-overlay-reference-id="{{subrogation.id}}">
           <td>
             {{subrogation.case.case_ref}}
           </td>
@@ -29,13 +30,44 @@
             {{subrogation.claims.length}}
           </td>
           <td>
-            <button class="btn btn-success" ng-click="selectSubrogation(subrogation,$index)">View</button>
-            <button class="btn btn-primary" ng-click="submit(subrogation)">Submit</button>
+            <button class="btn btn-success" ng-click="selectSubrogation(subrogation,$index)"><i class="fa fa-eye" aria-hidden="true"></i></button>
+            <button class="btn btn-primary" ng-click="submit(subrogation)"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+</div>
+<div class="modal fade" id="modalConfirm">
+  <script type="text/ng-template" id="myModalConfirmContent.html">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <button type="button" class="close" aria-label="Close" ng-click="dismiss()"><span aria-hidden="true">&times;</span></button> -->
+        <h4 class="modal-title">Subrogation sumitted</h4>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Process instance id:</h5>
+        </div>
+        <div class="col-md-5">
+          {{pid}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Timestamp:</h5>
+        </div>
+        <div class="col-md-5">
+          {{timestamp}}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="dismiss()">Ok</button>
+    </div>
+  </script>
 </div>
 <div class="modal fade" id="modalSubrogate">
   <script type="text/ng-template" id="myModalContent.html">
@@ -45,85 +77,101 @@
         <h4 class="modal-title">Create/Edit Subrogation</h4>
       </div>
       <div class="modal-body">
-        <div class="row">
+        <div class="row" ng-if="!editingSubrogation">
           <div class="col-md-12">
             <button class="btn btn-warning pull-right" ng-click="generateData()">Generate data</button>
           </div>
         </div>
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label for="case_ref" class="col-md-2 control-label">Reference</label>
+        <div class="row">
+          <div class="col-md-12">
+            &nbsp;
+          </div>
+        </div>        <form class="form">
+          <div class "row">
+            <div class="col-md-2">
+              <label for="case_ref" class="control-label">Reference</label>
+            </div>
             <div class="col-md-10">
               <input type="text" class="form-control" id="case_ref" placeholder="Case reference" ng-model="activeSubrogation.case.case_ref"/>
             </div>
           </div>
-          <div class="form-group">
-            <label for="client" class="col-md-2 control-label">Client</label>
+          <div class "row">
+            <div class="col-md-2">
+              <label for="case_ref" class="control-label">Client</label>
+            </div>
             <div class="col-md-10">
               <input type="text" class="form-control" id="client" placeholder="Client name" ng-model="activeSubrogation.client"/>
             </div>
           </div>
-        </form>
-        <form class="form">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Member</th>
-                <th>Provider</th>
-                <th>Amount</th>
-                <th>Actions</th>
-              </tr>
-              <tr>
-                <th>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="claim_reference" placeholder="Claim reference" ng-model="activeClaim.claim_reference"/>
-                  </div>
-                </th>
-                <th>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="claim_member" placeholder="Claim member" ng-model="activeClaim.claim_member"/>
-                  </div>
-                </th>
-                <th>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="claim_provider" placeholder="Claim provider" ng-model="activeClaim.claim_provider"/>
-                  </div>
-                </th>
-                <th>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="claim_amount" placeholder="Claim amount" ng-model="activeClaim.claim_amount"/>
-                  </div>
-                </th>
-                <th>
-                  <div class="form-group">
-                    <button class="btn btn-active" ng-click="addActiveClaim()" ng-if="!editingClaim">Add</button>
-                    <button class="btn btn-active" ng-click="saveActiveClaim()" ng-if="editingClaim">Save</button>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="claim in activeSubrogation.claims">
-                <td>
-                  {{claim.claim_reference}}
-                </td>
-                <td>
-                  {{claim.claim_member}}
-                </td>
-                <td>
-                  {{claim.claim_provider}}
-                </td>
-                <td>
-                  {{claim.claim_amount | currency }}
-                </td>
-                <td>
-                  <button class="btn btn-info" ng-click="editActiveClaim(claim,$index)">Edit</button>
-                  <button class="btn btn-danger" ng-click="deleteClaim()">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Member</th>
+                  <th>Provider</th>
+                  <th>Amount</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_reference" placeholder="Claim reference" ng-model="activeClaim.claim_reference"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_member" placeholder="Claim member" ng-model="activeClaim.claim_member"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_provider" placeholder="Claim provider" ng-model="activeClaim.claim_provider"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_amount" placeholder="Claim amount" ng-model="activeClaim.claim_amount"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <button class="btn btn-active" ng-click="addActiveClaim()" ng-if="!editingClaim"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>
+                      <button class="btn btn-active" ng-click="saveActiveClaim()" ng-if="editingClaim"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+                    </div>
+                  </th>
+                  <th>
+
+                  </th>
+                </tr>
+              </thead>
+                <tbody>
+                <tr ng-repeat="claim in activeSubrogation.claims">
+                  <td>
+                    {{claim.claim_reference}}
+                  </td>
+                  <td>
+                    {{claim.claim_member}}
+                  </td>
+                  <td>
+                    {{claim.claim_provider}}
+                  </td>
+                  <td>
+                    {{claim.claim_amount | currency }}
+                  </td>
+                  <td>
+                    <button class="btn btn-info" ng-click="editActiveClaim(claim,$index)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                  </td>
+                  <td>
+                    <button class="btn btn-danger" ng-click="deleteClaim(claim,$index)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+              </table>
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">

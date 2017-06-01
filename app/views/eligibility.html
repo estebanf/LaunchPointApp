@@ -1,1 +1,175 @@
-<p>This is the eligibility view.</p>
+<div class="row">
+  <div class="col-md-1 col-md-offset-11">
+    <button class="btn btn-primary" ng-click="openModal()"><i class="fa fa-file-o" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="col-md-12">
+    <h1>Eligibility</h1>
+    <table class="table table-striped table-hover">
+      <thead>
+        <th>
+          Case Reference
+        </th>
+        <th>
+          Member
+        </th>
+        <th>
+          # of claims
+        </th>
+        <th></th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="eligibility in eligibilities" class="bs-loading-container" bs-loading-overlay bs-loading-overlay-reference-id="{{eligibility.id}}">
+          <td>
+            {{eligibility.case.case_ref}}
+          </td>
+          <td>
+            {{eligibility.member}}
+          </td>
+          <td>
+            {{eligibility.eligibilityClaims.length}}
+          </td>
+          <td>
+            <button class="btn btn-success" ng-click="selectEligibility(eligibility,$index)"><i class="fa fa-eye" aria-hidden="true"></i></button>
+            <button class="btn btn-primary" ng-click="submit(eligibility)"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="modal fade" id="modalConfirm">
+  <script type="text/ng-template" id="myModalConfirmContent.html">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <button type="button" class="close" aria-label="Close" ng-click="dismiss()"><span aria-hidden="true">&times;</span></button> -->
+        <h4 class="modal-title">Eligibility sumitted</h4>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Process instance id:</h5>
+        </div>
+        <div class="col-md-5">
+          {{pid}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Timestamp:</h5>
+        </div>
+        <div class="col-md-5">
+          {{timestamp}}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="dismiss()">Ok</button>
+    </div>
+  </script>
+</div>
+<div class="modal fade" id="modalSubrogate">
+  <script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="dismiss()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Create/Edit Eligibilty</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row" ng-if="!editingEligibility">
+          <div class="col-md-12">
+            <button class="btn btn-warning pull-right" ng-click="generateData()">Generate data</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            &nbsp;
+          </div>
+        </div>
+        <form class="form">
+          <div class "row">
+            <div class="col-md-2">
+              <label for="case_ref" class="control-label">Reference</label>
+            </div>
+            <div class="col-md-10">
+              <input type="text" class="form-control" id="case_ref" placeholder="Case reference" ng-model="activeEligibility.case.case_ref"/>
+            </div>
+          </div>
+          <div class "row">
+            <div class="col-md-2">
+              <label for="case_ref" class="control-label">Member</label>
+            </div>
+            <div class="col-md-10">
+              <input type="text" class="form-control" id="client" placeholder="Client name" ng-model="activeEligibility.member"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Provider</th>
+                  <th>Amount</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_reference" placeholder="Claim reference" ng-model="activeClaim.claim_reference"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_provider" placeholder="Claim provider" ng-model="activeClaim.claim_provider"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="claim_amount" placeholder="Claim amount" ng-model="activeClaim.claim_amount"/>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="form-group">
+                      <button class="btn btn-active" ng-click="addActiveClaim()" ng-if="!editingClaim"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>
+                      <button class="btn btn-active" ng-click="saveActiveClaim()" ng-if="editingClaim"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+                    </div>
+                  </th>
+                  <th>
+
+                  </th>
+                </tr>
+              </thead>
+                <tbody>
+                <tr ng-repeat="claim in activeEligibility.eligibilityClaims">
+                  <td>
+                    {{claim.claim_reference}}
+                  </td>
+                  <td>
+                    {{claim.claim_provider}}
+                  </td>
+                  <td>
+                    {{claim.claim_amount | currency }}
+                  </td>
+                  <td>
+                    <button class="btn btn-info" ng-click="editActiveClaim(claim,$index)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                  </td>
+                  <td>
+                    <button class="btn btn-danger" ng-click="deleteClaim(claim,$index)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="dismiss()">Close</button>
+        <button type="button" class="btn btn-primary" ng-click="saveEligibility()">Save changes</button>
+      </div>
+    </script>
+  </div>
+</div>
