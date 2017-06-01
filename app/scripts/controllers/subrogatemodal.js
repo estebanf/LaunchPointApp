@@ -8,16 +8,13 @@
  * Controller of the launchPointAppApp
  */
 angular.module('launchPointAppApp')
-  .controller('SubrogatemodalCtrl', function ($scope, backend, $uibModalInstance,active,editing,$q) {
+  .controller('SubrogatemodalCtrl', function ($scope, backend, $uibModalInstance,active,editing,$q,bsLoadingOverlayService) {
     console.log(active);
     $scope.activeSubrogation = angular.copy(active);
 
     $scope.editingSubrogation = editing;
     $scope.generateData = function(){
-      backend.generateFakeData()
-        .then(function(data){
-          $scope.activeSubrogation = data;
-        })
+      $scope.activeSubrogation = backend.generateFakeData();
     }
     $scope.dismiss = function(){
       $uibModalInstance.dismiss('cancel');

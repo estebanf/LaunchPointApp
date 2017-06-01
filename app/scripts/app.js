@@ -8,7 +8,7 @@
  *
  * Main module of the application.
  */
-angular
+var app = angular
   .module('launchPointAppApp', [
     'ngAnimate',
     'ngCookies',
@@ -16,9 +16,10 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-    'ui.bootstrap'
-  ])
-  .config(function ($routeProvider) {
+    'ui.bootstrap',
+    'bsLoadingOverlay'
+  ]);
+app.config(function ($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
@@ -44,3 +45,8 @@ angular
         redirectTo: '/'
       });
   });
+app.run(function(bsLoadingOverlayService) {
+	bsLoadingOverlayService.setGlobalConfig({
+		templateUrl: '/loading-overlay-template.html'
+	})
+});
