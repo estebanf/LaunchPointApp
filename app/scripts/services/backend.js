@@ -81,6 +81,9 @@ angular.module('launchPointAppApp')
       deleteEligibilityClaim:function(claim){
         return invokeApi($http.delete,'/api/EligibilityClaims/' + claim.id);
       },
+      getProcessedCases:function(){
+        return invokeApi($http.get,'/api/processedCases');
+      },
       generateFakeSubrogation:function(){
         function makeClaim(){
           return {
@@ -129,7 +132,7 @@ angular.module('launchPointAppApp')
         return data;
       },
 
-      submitCase:function(subrogation){
+      submitCase:function(caseObj){
         var data = {
           "proc:Create_CaseRequest":{
             "@xmlns":{
@@ -137,10 +140,32 @@ angular.module('launchPointAppApp')
               "laun":"http:\/\/launchpoint.everteam.com"
             },
             "laun:caseId":{
-              "$":subrogation.caseId
+              "$":caseObj.caseId
             }
           }
         }
+        return invokeApi(
+          $http.post,
+          '/everteam/ode/processes/LaunchPoint_Processes_Core_workflow_process_data_records',
+          data,{
+          headers:{
+            'Content-Type':'application/json/badgerfish'
+          }
+        });
+      },
+      submitCaseChanged:function(caseObj){
+        var data = {
+          "proc:Case_changedRequest":{
+            "@xmlns":{
+              "proc":"http:\/\/launchpoint.everteam.com\/Processes\/Core\/workflow\/process",
+              "laun":"http:\/\/launchpoint.everteam.com"
+            },
+            "laun:caseId":{
+              "$":caseObj.CASEID
+            }
+          }
+        }
+        console.log(data);
         return invokeApi(
           $http.post,
           '/everteam/ode/processes/LaunchPoint_Processes_Core_workflow_process_data_records',
